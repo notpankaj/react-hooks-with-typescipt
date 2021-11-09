@@ -1,0 +1,136 @@
+### props and Funtional Components ###
+
+#we define react component with React.FC
+#and props that it takes with <> , an object with value and type
+
+const TypeText :React.FC <{text : 'string'}> = () => {
+
+#-OR-
+#we can define interface 
+interface Person {
+  firstName: string;
+  lastName: string;
+}
+
+interface Props {
+  text: string;
+  ok?: Boolean;
+  //   i: number;
+  //   fn: () => void; //function with no return
+  fn?: (bob: string) => number; //funtion with number return and string parameter
+  person: Person;
+}
+
+const TypeText: React.FC<Props> = ({ person, text, children, fn, ok }) => {
+  return <div>HELLO</div>;
+};
+
+
+
+
+# ----------------------------------------------#
+### hooks ###
+
+---> useState()
+# by default useState set the type automatically 
+# but we have to use " or " operator , when were changing it
+
+interface SomeNode {
+  something: string;
+}
+
+ const [test, setTest] = useState<SomeNode>({something: "SOMETESTTEXT"});
+ const [count, setCount] = useState<number | null | undefined>(5);
+ setCount(null);
+ setCount(undefined);
+ setTest({ something: "some" });
+
+---> useRef()
+
+interface Props {
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const TsRef: React.FC<Props> = ({ handleChange }) => {
+ const inputRef = useRef<HTMLInputElement>(null);
+ const divRef = useRef<HTMLDivElement>(null);
+
+  <div ref={divRef}>
+    <input
+        type="text"
+        ref={inputRef}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e)}
+    />
+  </div>
+
+
+  --> useReducer()
+type Actions = { type: "add"; text: string } | { type: "remove"; idx: number };
+
+interface Todo {
+  text: string;
+  complete: Boolean;
+}
+
+type State = Todo[];
+
+const TodoReducer = (state: State, action: Actions) => {
+  switch (action.type) {
+    case "add":
+      return [...state, { text: action.text, complete: false }];
+    case "remove":
+      return state.filter((_, i) => action.idx! == i);
+    default:
+      return state;
+  }
+};
+
+const ReducerExample: React.FC = () => {
+  const [todos, dispatch] = useReducer(TodoReducer, []);
+
+  return (
+    <div>
+      {JSON.stringify(todos)}
+      <button onClick={() => dispatch({ type: "add", text: "..." })}>+</button>
+    </div>
+  );
+};
+
+
+# ----------------------------------------------#
+### render Props ###
+//Counter.js
+import { useState } from "react";
+
+interface Props {
+  children: (data: {
+    count: number;
+    setCount: React.Dispatch<React.SetStateAction<number>>;
+  }) => JSX.Element | null;
+}
+
+const Counter: React.FC<Props> = ({ children }) => {
+  const [count, setCount] = useState(0);
+
+  return <div>{children({ count, setCount })}</div>;
+};
+
+export default Counter;
+
+//App.js
+import { useState } from "react";
+
+interface Props {
+  children: (data: {
+    count: number;
+    setCount: React.Dispatch<React.SetStateAction<number>>;
+  }) => JSX.Element | null;
+}
+
+const Counter: React.FC<Props> = ({ children }) => {
+  const [count, setCount] = useState(0);
+
+  return <div>{children({ count, setCount })}</div>;
+};
+
+export default Counter;
